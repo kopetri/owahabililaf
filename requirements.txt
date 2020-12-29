@@ -1,3 +1,4 @@
 pycountry==20.7.3
 python-telegram-bot==13.1
-numpy==1.19.4
+numpy==1.19.3
+tinydb==4.3.0
