@@ -89,7 +89,7 @@ def select_continent(update,context,replace=True):
   if not replace:
     bot.reply_text(text='Welcher Kontinent?',reply_markup=reply_markup)
   else:
-    bot.edit_message_text(text='Welcher Kontinent?',reply_markup=reply_markup)
+    update.callback_query.edit_message_text(text='Welcher Kontinent?',reply_markup=reply_markup)
 
 def build_menu(buttons,n_cols,header_buttons=None,footer_buttons=None):
   menu = [buttons[i:i + n_cols] for i in range(0, len(buttons), n_cols)]
@@ -110,10 +110,11 @@ def make_callback(cb):
   def f(update, context):
     button_list = []
     for code in get_countries(cb):
-      label = "{}".format(code)
+      name = pc.country_alpha2_to_country_name(code)
+      label = "{}({})".format(name, code)
       button_list.append(InlineKeyboardButton(label, callback_data="country_{}".format(code)))
     button_list.append(InlineKeyboardButton('Zurück', callback_data='select_continent'))
-    reply_markup=InlineKeyboardMarkup(build_menu(button_list,n_cols=7)) #n_cols = 1 is for single column and mutliple rows
+    reply_markup=InlineKeyboardMarkup(build_menu(button_list,n_cols=2)) #n_cols = 1 is for single column and mutliple rows
     update.callback_query.edit_message_text(text='Welches Land ist das?',reply_markup=reply_markup)
   return f
 
@@ -123,7 +124,7 @@ def make_country_callback(selected_country):
     if selected_country == correct_country.alpha_2:
         txt = "{} - {}".format(correct_country.name, np.random.choice(positive_feedback, 1)[0])
     else:
-        txt = "{} Richtig wäre gewesen:\n{} ({}), {}".format(np.random.choice(negative_feedback, 1)[0], correct_country.name, correct_country.alpha_2, pc.convert_continent_code_to_continent_name(country_alpha2_to_continent_code(correct_country.alpha_2)))
+        txt = "{} - {} Richtig wäre gewesen:\n{} ({}), {}".format(selected_country, np.random.choice(negative_feedback, 1)[0], correct_country.name, correct_country.alpha_2, pc.convert_continent_code_to_continent_name(country_alpha2_to_continent_code(correct_country.alpha_2)))
     
     # store
     user_id = update.callback_query.message.chat.id
@@ -147,7 +148,7 @@ def validate(update, context, choice):
     if choice == current_idx:
         txt = "{}".format(np.random.choice(positive_feedback, 1)[0])
     else:
-        txt = "{} Richtig wäre gewesen: {}".format(np.random.choice(negative_feedback, 1)[0], correct_answer.name)
+        txt = "{} - {} Richtig wäre gewesen: {}".format(,np.random.choice(negative_feedback, 1)[0], correct_answer.name)
     update.callback_query.edit_message_text(txt, reply_markup=InlineKeyboardMarkup(keyboard))
     user_id = update.callback_query.message.chat.id
     country_id = correct_answer.alpha_2
