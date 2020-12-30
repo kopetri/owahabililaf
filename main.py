@@ -139,26 +139,6 @@ def make_country_callback(selected_country):
     start(update, context)
   return f
 
-def validate(update, context, choice):
-    global choices
-    global current_idx
-    keyboard = [[]]
-    correct_answer = choices[current_idx]
-    user_answer = choices[choice]
-    if choice == current_idx:
-        txt = "{}".format(np.random.choice(positive_feedback, 1)[0])
-    else:
-        txt = "{} - {} Richtig wäre gewesen: {}".format(,np.random.choice(negative_feedback, 1)[0], correct_answer.name)
-    update.callback_query.edit_message_text(txt, reply_markup=InlineKeyboardMarkup(keyboard))
-    user_id = update.callback_query.message.chat.id
-    country_id = correct_answer.alpha_2
-    answer_country_id = user_answer.alpha_2
-    data = database.insert_answer(user_id=user_id, country_id=country_id, answer_country_id=answer_country_id)
-    logger.info("Created data point")
-    logger.info(data)
-    time.sleep(delay)
-    build_question(update, context)
-
 def main() -> None:
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
